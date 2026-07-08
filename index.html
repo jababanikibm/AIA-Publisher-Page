@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Agentic AI Induction Training</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #071726;
+      --surface: #0f2a49;
+      --surface-strong: #112f5b;
+      --surface-soft: rgba(13, 36, 63, 0.8);
+      --accent: #1b7fff;
+      --accent-boost: #37b0ff;
+      --text: #eef5ff;
+      --muted: #9bb9d6;
+      --green: #19b294;
+      --purple: #8a5cff;
+      --orange: #ff8b32;
+      --red: #ef4f62;
+      --shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      background: radial-gradient(circle at top left, rgba(29, 120, 255, 0.18), transparent 24%),
+                  radial-gradient(circle at bottom right, rgba(23, 243, 255, 0.08), transparent 20%),
+                  var(--bg);
+      color: var(--text);
+    }
+
+    body {
+      padding: 32px;
+      display: flex;
+      justify-content: center;
+      align-items: start;
+    }
+
+    .page {
+      width: min(1200px, 100%);
+      display: grid;
+      gap: 28px;
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: linear-gradient(135deg, rgba(27, 127, 255, 0.16), rgba(83, 169, 255, 0.04));
+      border: 1px solid rgba(115, 183, 255, 0.18);
+      color: #dbefff;
+      padding: 14px 18px;
+      border-radius: 999px;
+      font-weight: 600;
+      font-size: 0.94rem;
+      letter-spacing: .01em;
+      box-shadow: var(--shadow);
+    }
+
+    .intro {
+      display: grid;
+      gap: 12px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.95rem;
+      color: var(--accent-boost);
+      font-weight: 600;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2.9rem, 2.8vw, 4.3rem);
+      line-height: 0.98;
+      letter-spacing: -0.04em;
+    }
+
+    p.lead {
+      margin: 0;
+      max-width: 760px;
+      color: var(--muted);
+      font-size: 1.05rem;
+      line-height: 1.9;
+    }
+
+    .grid {
+      display: grid;
+      gap: 24px;
+      grid-template-columns: 1.65fr 1fr;
+    }
+
+    .panel {
+      background: linear-gradient(180deg, rgba(17, 48, 92, 0.96), rgba(10, 24, 46, 0.88));
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 28px;
+      padding: 28px;
+      box-shadow: var(--shadow);
+    }
+
+    .panel h2 {
+      margin-top: 0;
+      margin-bottom: 22px;
+      font-size: 1.3rem;
+      letter-spacing: -0.02em;
+    }
+
+    .panel small {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--accent-boost);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .14em;
+      font-size: 0.78rem;
+      margin-bottom: 16px;
+    }
+
+    .timeline {
+      display: grid;
+      gap: 18px;
+    }
+
+    .step-card {
+      position: relative;
+      display: grid;
+      gap: 12px;
+      padding: 24px 24px 24px 92px;
+      background: linear-gradient(135deg, rgba(22, 64, 140, 0.9), rgba(11, 28, 53, 0.9));
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 22px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform .2s ease, border-color .2s ease, background .2s ease;
+    }
+
+    .step-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(27, 127, 255, 0.32);
+      background: linear-gradient(135deg, rgba(28, 90, 180, 0.95), rgba(10, 24, 53, 0.95));
+    }
+
+    .step-card::before {
+      content: attr(data-step);
+      position: absolute;
+      left: 24px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 52px;
+      height: 52px;
+      display: grid;
+      place-items: center;
+      border-radius: 16px;
+      background: linear-gradient(180deg, #1373ff, #1f5ae4);
+      font-weight: 800;
+      color: white;
+      font-size: 1rem;
+      box-shadow: 0 18px 40px rgba(0, 96, 255, 0.18);
+    }
+
+    .step-card.active {
+      border-color: rgba(27, 191, 255, 0.45);
+      background: radial-gradient(circle at top left, rgba(30, 143, 255, 0.2), transparent 40%),
+                  linear-gradient(135deg, rgba(23, 75, 142, 0.98), rgba(9, 23, 43, 0.98));
+    }
+
+    .step-card h3 {
+      margin: 0;
+      font-size: 1.2rem;
+    }
+
+    .step-card p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.7;
+      font-size: 0.98rem;
+    }
+
+    .panel-right {
+      display: grid;
+      gap: 18px;
+    }
+
+    .module-grid {
+      display: grid;
+      gap: 14px;
+    }
+
+    .module-card {
+      display: grid;
+      gap: 14px;
+      padding: 20px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255,255,255,0.06);
+      transition: transform .2s ease, border-color .2s ease;
+      cursor: pointer;
+    }
+
+    .module-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(83, 169, 255, 0.24);
+    }
+
+    .module-tag {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: fit-content;
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: white;
+    }
+
+    .tag-dpe { background: #1f5aff; }
+    .tag-amm { background: #8f5cff; }
+    .tag-sap { background: #26c79f; }
+    .tag-data { background: #45b3ff; }
+    .tag-sec { background: #ef4f62; }
+    .tag-hyb { background: #15bf6f; }
+
+    .module-card h3 {
+      margin: 0;
+      font-size: 1.05rem;
+    }
+
+    .module-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 1.65;
+    }
+
+    .center-arrow {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100%;
+    }
+
+    .arrow-shape {
+      width: 72px;
+      height: 180px;
+      position: relative;
+      margin: 0 auto;
+    }
+
+    .arrow-shape::before,
+    .arrow-shape::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(180deg, #1b76ff, #1051ad);
+      border-radius: 999px;
+    }
+
+    .arrow-shape::before {
+      width: 28px;
+      height: 120px;
+      top: 10px;
+    }
+
+    .arrow-shape::after {
+      width: 90px;
+      height: 80px;
+      top: 100px;
+      clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+    }
+
+    .footer-cards {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 12px;
+    }
+
+    .footer-chip {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 72px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 18px;
+      padding: 14px 16px;
+      font-size: 0.95rem;
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .footer-chip span {
+      display: inline-flex;
+      margin-right: 8px;
+    }
+
+    @media (max-width: 1024px) {
+      body { padding: 24px; }
+      .grid { grid-template-columns: 1fr; }
+      .footer-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 680px) {
+      body { padding: 16px; }
+      .top-bar { flex-direction: column; align-items: flex-start; }
+      .panel { padding: 22px; }
+      .step-card { padding-left: 84px; }
+      .footer-cards { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <div class="top-bar">
+      <span class="badge">INDUCTION TRAINING · COLLEGE GRADUATE HIRE PROGRAMME</span>
+      <span class="badge">OUTCOME: AGENTIC AI SPECIALISTS</span>
+    </div>
+
+    <section class="intro">
+      <div class="eyebrow">Structured Learning Journey (Time →)</div>
+      <h1>Building Client-Ready Agentic AI Talent</h1>
+      <p class="lead">A structured, outcome-oriented 90-day induction pathway that accelerates graduate readiness for live client engagements.</p>
+    </section>
+
+    <section class="grid">
+      <div class="panel">
+        <div>
+          <small>01</small>
+          <h2>Classroom Lessons</h2>
+          <p>Foundational concepts: AI, cloud, hybrid architecture &amp; agentic frameworks</p>
+        </div>
+
+        <div class="timeline">
+          <article class="step-card active" data-step="01" onclick="activateStep(this)">
+            <h3>Classroom Lessons</h3>
+            <p>Foundational concepts: AI, cloud, hybrid architecture &amp; agentic frameworks.</p>
+          </article>
+
+          <article class="step-card" data-step="02" onclick="activateStep(this)">
+            <h3>Capstone Project</h3>
+            <p>Team-based real-world problem statements; graded delivery with peer review.</p>
+          </article>
+
+          <article class="step-card" data-step="03" onclick="activateStep(this)">
+            <h3>Geek Clinics</h3>
+            <p>Weekly deep-dives: prompt engineering, LangChain, IBM watsonx &amp; toolchains.</p>
+          </article>
+
+          <article class="step-card" data-step="04" onclick="activateStep(this)">
+            <h3>ISV Certification</h3>
+            <p>Industry credentials: IBM, AWS, Watsonx.ai &amp; partner.</p>
+          </article>
+        </div>
+      </div>
+
+      <div class="panel panel-right">
+        <div>
+          <small>Practice Area Cohort Deployment</small>
+          <h2>&nbsp;</h2>
+        </div>
+
+        <div class="module-grid">
+          <div class="module-card" onclick="activateModule(this)">
+            <span class="module-tag tag-dpe">DPE</span>
+            <h3>Digital Process Engineering</h3>
+          </div>
+          <div class="module-card" onclick="activateModule(this)">
+            <span class="module-tag tag-amm">AMM</span>
+            <h3>App Modernisation &amp; Migration</h3>
+          </div>
+          <div class="module-card" onclick="activateModule(this)">
+            <span class="module-tag tag-sap">SAP</span>
+            <h3>SAP Practice</h3>
+          </div>
+          <div class="module-card" onclick="activateModule(this)">
+            <span class="module-tag tag-data">DATA</span>
+            <h3>Data &amp; AI Analytics</h3>
+          </div>
+          <div class="module-card" onclick="activateModule(this)">
+            <span class="module-tag tag-sec">SEC</span>
+            <h3>Cybersecurity Practice</h3>
+          </div>
+          <div class="module-card" onclick="activateModule(this)">
+            <span class="module-tag tag-hyb">HYB</span>
+            <h3>Hybrid Cloud</h3>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="footer-cards">
+      <div class="footer-chip"><span>⏱️</span>Daily: 5–6 PM</div>
+      <div class="footer-chip"><span>💬</span>Clear Doubts</div>
+      <div class="footer-chip"><span>🤝</span>Build Network</div>
+      <div class="footer-chip"><span>🎯</span>Mentoring</div>
+      <div class="footer-chip"><span>🧠</span>Experiential Learning</div>
+    </section>
+  </main>
+
+  <script>
+    function activateStep(card) {
+      document.querySelectorAll('.step-card').forEach(item => item.classList.remove('active'));
+      card.classList.add('active');
+    }
+
+    function activateModule(card) {
+      document.querySelectorAll('.module-card').forEach(item => item.classList.remove('selected'));
+      card.classList.add('selected');
+      if (!card.style.boxShadow) {
+        document.querySelectorAll('.module-card').forEach(item => item.style.boxShadow = '');
+        card.style.boxShadow = '0 18px 40px rgba(27, 127, 255, 0.24)';
+      }
+    }
+  </script>
+</body>
+</html>
